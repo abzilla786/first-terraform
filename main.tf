@@ -30,7 +30,7 @@ resource "aws_route_table" "public" {
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = data.aws_internet_gateway.default-gw
+    gateway_id = data.aws_internet_gateway.default-gw.id
   }
   tags = {
     Name = "${var.name}-public-table"
