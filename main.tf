@@ -20,13 +20,42 @@ resource "aws_subnet" "app_subnet" {
     cidr_block = "172.31.35.0/24"
     availability_zone = "eu-west-1a"
     tags = {
-      Name = "eng54-subnet-public"
+      Name = var.name
     }
+}
+
+# route tables
+resource "aws_route_table" "public" {
+  vpc_id = var.vpc_id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = data.aws_internet_gateway.default-gw
+  }
+  tags = {
+    Name = "${var.name}-public-table"
+  }
+}
+
+resource "aws_route_table_association" "assoc" {
+  subnet_id = aws_subnet.app_subnet.id
+  route_table_id = aws_route_table.public.id
+
+}
+
+# we dont need a new Internet Gateway
+# we can query our exiting vpc/infrastructure with the 'data' handler
+data "aws_internet_gateway" "default-gw" {
+  filter {
+    # on the hashicorp docs it references AWS-APi that has this filter
+    name = "attachment.vpc-id"
+    values = [var.vpc_id]
+  }
 }
 
 resource "aws_security_group" "app_sg" {
   name        = "app-sg-abz-name"
-  vpc_id      = "vpc-07e47e9d90d2076da"
+  vpc_id      = var.vpc_id
   description = "security group that allows port 80 from anywhere"
 
   ingress {
@@ -54,15 +83,14 @@ resource "aws_security_group" "app_sg" {
 
 resource "aws_instance" "app_instance" {
 
-    ami   = "ami-040bb941f8d94b312"
+    ami   = var.ami_id
     instance_type = "t2.micro"
     associate_public_ip_address = true
     subnet_id = "${aws_subnet.app_subnet.id}"
     vpc_security_group_ids = [aws_security_group.app_sg.id]
     tags = {
-        Name = "eng-54-ABZ-app"
+        Name = var.name
     }
 }
 
-#route table
 #
