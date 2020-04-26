@@ -65,6 +65,20 @@ resource "aws_security_group" "app_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  ingress {
+    description = "allows port 3000"
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    description = "allows port 22 on my ip"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["5.64.99.193/32"]
+  }
 
   # default outbound rules for sg is it lets everything out
   egress {
@@ -86,11 +100,27 @@ resource "aws_instance" "app_instance" {
     ami   = var.ami_id
     instance_type = "t2.micro"
     associate_public_ip_address = true
-    subnet_id = "${aws_subnet.app_subnet.id}"
+    subnet_id = aws_subnet.app_subnet.id
     vpc_security_group_ids = [aws_security_group.app_sg.id]
     tags = {
         Name = var.name
     }
+    key_name = "abz-eng54"
+
+    provisioner "remote-exec" {
+      inline = [
+        "cd /home/ubuntu/appjs",
+        "npm start",
+      ]
+    }
+    connection {
+      type = "ssh"
+      user = "ubuntu"
+      host = self.public_ip
+      private_key = "${file("~/.ssh/abz-eng54.pem")}"
+    }
+  
 }
+
 
 #
