@@ -39,7 +39,12 @@ module "app" {
   igtw = aws_internet_gateway.igw.id
   # gateway_id = data.aws_internet_gateway.default-gw.id
 }
-
+module "mongod" {
+  source = "./modules/mongod_tier"
+  vpc_id = aws_vpc.app_vpc.id
+  name2 = var.name2
+  mongod_ami_id = var.mongod_ami_id
+}
 # Inbout and outbound rules for public subnet
 
 ### Creating DB

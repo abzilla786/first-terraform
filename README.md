@@ -32,12 +32,4 @@ now once you have run the above command and no errors have shown, you can now ru
 terraform apply
 ```
 
-this will create your ec2 instance and automatically start the app. on the terminal you will notice that it doesnt finish running the task, this is because it automatically starts the app so it will not close.
-
-you can navigate to your instance on AWS and copy the public ip into the url, this will show you the running app.
-
-once you are satisified with the app you can close the terminal by pressing
-```
-ctrl+c
-
-```
+this will create your ec2 instance and automatically start the app. 

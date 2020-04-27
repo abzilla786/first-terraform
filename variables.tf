@@ -6,10 +6,17 @@ variable "name" {
   default = "eng54-subnet-public"
 }
 
+variable "name2" {
+  default = "eng54-subnet-private"
+}
+
 variable "ami_id" {
   default = "ami-0a6f6fe6f6bd899b8"
 }
 
+variable "mongod_ami_id" {
+  default = "ami-07f48f21568b91e64"
+}
 # variable "gateway_id" {
 #   default = "data.aws_internet_gateway.default-gw.id"
 # }
