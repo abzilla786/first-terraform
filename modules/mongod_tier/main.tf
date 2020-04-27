@@ -101,3 +101,17 @@ resource "aws_security_group" "mongod_sg" {
     Name = "allow_tls"
   }
 }
+
+resource "aws_instance" "app_instance" {
+
+    ami   = var.mongod_ami_id
+    instance_type = "t2.micro"
+    associate_public_ip_address = true
+    subnet_id = aws_subnet.mongod_subnet.id
+    vpc_security_group_ids = [aws_security_group.mongod_sg.id]
+    tags = {
+        Name = var.name2
+    }
+    key_name = "abz-eng54"
+
+}

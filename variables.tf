@@ -3,11 +3,11 @@
 # }
 
 variable "name" {
-  default = "eng54-subnet-public"
+  default = "eng54-abz-app"
 }
 
 variable "name2" {
-  default = "eng54-subnet-private"
+  default = "eng54-abz-mongod"
 }
 
 variable "ami_id" {
