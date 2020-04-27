@@ -17,6 +17,7 @@ resource "aws_subnet" "app_subnet" {
 # Creating NACLs
 resource "aws_network_acl" "public-nacl" {
   vpc_id = var.vpc_id
+  subnet_ids = [aws_subnet.app_subnet.id]
 
   ingress {
     protocol   = "tcp"

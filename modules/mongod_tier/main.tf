@@ -10,6 +10,7 @@ resource "aws_subnet" "mongod_subnet" {
 # Creating NACLs
 resource "aws_network_acl" "private-nacl" {
   vpc_id = var.vpc_id
+  subnet_ids = [aws_subnet.mongod_subnet.id]
 
   ingress {
     protocol   = "tcp"
