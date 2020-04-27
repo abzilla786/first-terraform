@@ -6,12 +6,73 @@
 # create new subnet
 # move our instance into said subnet
 resource "aws_subnet" "app_subnet" {
-    vpc_id = "vpc-07e47e9d90d2076da"
-    cidr_block = "172.31.35.0/24"
+    vpc_id = var.vpc_id
+    cidr_block = "10.0.18.0/24"
     availability_zone = "eu-west-1a"
     tags = {
       Name = var.name
     }
+}
+
+# Creating NACLs
+resource "aws_network_acl" "public-nacl" {
+  vpc_id = var.vpc_id
+
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 80
+    to_port    = 80
+  }
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 110
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 443
+    to_port    = 443
+  }
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 120
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 3000
+    to_port    = 3000
+  }
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 130
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 1024
+    to_port    = 65535
+  }
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 140
+    action     = "allow"
+    cidr_block = "5.64.99.193/32"
+    from_port  = 22
+    to_port    = 22
+  }
+
+  egress {
+    protocol   = "tcp"
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 0
+    to_port    = 0
+  }
+
+
+  tags = {
+    Name = "${var.name}-nacl"
+  }
+
 }
 
 resource "aws_route_table" "public" {
@@ -19,7 +80,7 @@ resource "aws_route_table" "public" {
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = var.gateway_id
+    gateway_id = var.igtw
   }
   tags = {
     Name = "${var.name}-public-table"
@@ -75,6 +136,13 @@ resource "aws_security_group" "app_sg" {
 
 data "template_file" "app_init" {
   template = file("./scripts/app/init.sh.tpl")
+  vars = {
+    my_name = "${var.name} is the real name Abdullah"
+  }
+  # set ports
+  # for the mongod db, setting private_ip for db_host
+  # AWS gives us new ips - if we want to make one machine aware of another
+
 }
 # launching an instance
 

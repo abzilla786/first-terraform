@@ -10,6 +10,6 @@ variable "ami_id" {
   description = "the name of the ami to use for creating the EC2"
 }
 
-variable "gateway_id" {
-  description = "gateway id for route table"
+variable "igtw" {
+  description = "igtw for querying our db"
 }

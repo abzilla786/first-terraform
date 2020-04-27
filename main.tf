@@ -4,46 +4,62 @@ provider "aws" {
 
 # creating a vpc
 
-#resource "aws_vpc" "app_vpc" {
-#    cidr_block = "10.0.0.0/16"
-#    tags = {
-#        Name = "Eng-54-ABZ-app_vpc"
-#    }
-#}
+resource "aws_vpc" "app_vpc" {
+   cidr_block = "10.0.0.0/16"
+   tags = {
+       Name = "${var.name}-vpc"
+   }
+}
 
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.app_vpc.id
 
-
-# we dont need a new Internet Gateway
-# we can query our exiting vpc/infrastructure with the 'data' handler
-data "aws_internet_gateway" "default-gw" {
-  filter {
-    # on the hashicorp docs it references AWS-APi that has this filter
-    name = "attachment.vpc-id"
-    values = [var.vpc_id]
+  tags = {
+    Name = "${var.name}-ig"
   }
 }
 
 
+# we dont need a new Internet Gateway
+# we can query our exiting vpc/infrastructure with the 'data' handler
+# data "aws_internet_gateway" "default-gw" {
+#   filter {
+#     # on the hashicorp docs it references AWS-APi that has this filter
+#     name = "attachment.vpc-id"
+#     values = [var.vpc_id]
+#   }
+# }
+
+
 module "app" {
   source = "./modules/app_tier"
-  vpc_id = var.vpc_id
+  vpc_id = aws_vpc.app_vpc.id
   name = var.name
   ami_id = var.ami_id
-  gateway_id = var.gateway_id
+  igtw = aws_internet_gateway.igw.id
+  # gateway_id = data.aws_internet_gateway.default-gw.id
 }
 
+# Inbout and outbound rules for public subnet
+
+### Creating DB
+
+# create private subnet
+
+# make route table association
+
+# Inbount and outbound rules for private subnet
+
+# Deploying instance with AMI that has mongodb inside
+
+# SG rules for private instance
+
+# Initi script for private instance
 
 
-    # provisioner "remote-exec" {
-    #   inline = [
-    #     "cd /home/ubuntu/appjs",
-    #     "npm start",
-    #   ]
-    # }
-    # connection {
-    #   type = "ssh"
-    #   user = "ubuntu"
-    #   host = self.public_ip
-    #   private_key = "${file("~/.ssh/abz-eng54.pem")}"
-    # }
-    #
+### Bastion
+# create instance with bastion server
+
+# sg for bastion server
+
+# init script for bastion server
