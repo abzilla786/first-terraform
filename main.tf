@@ -93,6 +93,10 @@ resource "aws_security_group" "app_sg" {
     Name = "allow_tls"
   }
 }
+
+data "template_file" "app_init" {
+  template = file("./scripts/app/init.sh.tpl")
+}
 # launching an instance
 
 resource "aws_instance" "app_instance" {
@@ -107,20 +111,20 @@ resource "aws_instance" "app_instance" {
     }
     key_name = "abz-eng54"
 
-    provisioner "remote-exec" {
-      inline = [
-        "cd /home/ubuntu/appjs",
-        "npm start",
-      ]
-    }
-    connection {
-      type = "ssh"
-      user = "ubuntu"
-      host = self.public_ip
-      private_key = "${file("~/.ssh/abz-eng54.pem")}"
-    }
-  
+    user_data = data.template_file.app_init.rendered
+
+
+    # provisioner "remote-exec" {
+    #   inline = [
+    #     "cd /home/ubuntu/appjs",
+    #     "npm start",
+    #   ]
+    # }
+    # connection {
+    #   type = "ssh"
+    #   user = "ubuntu"
+    #   host = self.public_ip
+    #   private_key = "${file("~/.ssh/abz-eng54.pem")}"
+    # }
+    #
 }
-
-
-#
