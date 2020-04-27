@@ -9,3 +9,7 @@ variable "name" {
 variable "ami_id" {
   default = "ami-0a6f6fe6f6bd899b8"
 }
+
+variable "gateway_id" {
+  default = "data.aws_internet_gateway.default-gw.id"
+}
