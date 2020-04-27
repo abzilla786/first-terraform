@@ -102,7 +102,7 @@ resource "aws_security_group" "mongod_sg" {
   }
 }
 
-resource "aws_instance" "app_instance" {
+resource "aws_instance" "mongod_instance" {
 
     ami   = var.mongod_ami_id
     instance_type = "t2.micro"
