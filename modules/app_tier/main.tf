@@ -55,13 +55,21 @@ resource "aws_network_acl" "public-nacl" {
     protocol   = "tcp"
     rule_no    = 140
     action     = "allow"
-    cidr_block = "5.64.99.193/32"
+    cidr_block = "${var.my_ip}/32"
     from_port  = 22
     to_port    = 22
   }
 
-  egress {
+  ingress {
     protocol   = "tcp"
+    rule_no    = 150
+    action     = "allow"
+    cidr_block = "10.0.20.0/24"
+    from_port  = 22
+    to_port    = 22
+  }
+  egress {
+    protocol   = -1
     rule_no    = 100
     action     = "allow"
     cidr_block = "0.0.0.0/0"
@@ -119,14 +127,28 @@ resource "aws_security_group" "app_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["5.64.99.193/32"]
+    cidr_blocks = ["${var.my_ip}/32"]
+  }
+  ingress {
+    description = "allows port 22 on my ip"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.20.0/24"]
   }
 
+  ingress {
+    description = "ephemeral ports"
+    from_port   = 1024
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.20.0/24"]
+  }
   # default outbound rules for sg is it lets everything out
   egress {
    from_port   = 0
    to_port     = 0
-   protocol    = "-1"
+   protocol    = -1
    cidr_blocks = ["0.0.0.0/0"]
  }
 
@@ -138,12 +160,11 @@ resource "aws_security_group" "app_sg" {
 data "template_file" "app_init" {
   template = file("./scripts/app/init.sh.tpl")
   vars = {
-    my_name = "${var.name} is the real name Abdullah"
+    db_priv_ip = var.db_ip
   }
   # set ports
   # for the mongod db, setting private_ip for db_host
   # AWS gives us new ips - if we want to make one machine aware of another
-
 }
 # launching an instance
 

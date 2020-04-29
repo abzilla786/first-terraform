@@ -13,3 +13,9 @@ variable "ami_id" {
 variable "igtw" {
   description = "igtw for querying our db"
 }
+variable "db_ip" {
+  description = "private ip"
+}
+variable "my_ip" {
+  description = "dynamic ip"
+}

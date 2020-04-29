@@ -1,6 +1,7 @@
 #!/bin/bash
-
-echo "${my_name}"
+echo "export DB_HOST='mongodb://${db_priv_ip}:27017/posts'" >> /home/ubuntu/.bashrc
+export DB_HOST='mongodb://${db_priv_ip}:27017/posts'
 cd /home/ubuntu/appjs
 sudo npm install
-pm2 start app.js
+nodejs seeds/seed.js
+npm start

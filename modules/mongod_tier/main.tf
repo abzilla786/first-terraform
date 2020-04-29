@@ -34,9 +34,18 @@ resource "aws_network_acl" "private-nacl" {
     rule_no    = 100
     action     = "allow"
     cidr_block = "10.0.18.0/24"
+    from_port  = 1025
+    to_port    = 65535
+  }
+  egress {
+    protocol   = "tcp"
+    rule_no    = 110
+    action     = "allow"
+    cidr_block = "10.0.18.0/24"
     from_port  = 22
     to_port    = 22
   }
+
 
 
   tags = {
@@ -89,19 +98,19 @@ resource "aws_security_group" "mongod_sg" {
   egress {
    from_port   = 0
    to_port     = 0
-   protocol    = "-1"
+   protocol    = -1
    cidr_blocks = ["0.0.0.0/0"]
  }
- egress {
-  from_port   = 1025
-  to_port     = 65535
-  protocol    = "tcp"
-  cidr_blocks = ["0.0.0.0/0"]
-}
+
   tags = {
     Name = "allow_tls"
   }
 }
+
+data "template_file" "mongod_init" {
+  template = file("./scripts/mongod/init.sh.tpl")
+  }
+
 
 resource "aws_instance" "mongod_instance" {
 
@@ -115,4 +124,5 @@ resource "aws_instance" "mongod_instance" {
     }
     key_name = "abz-eng54"
 
+      user_data = data.template_file.mongod_init.rendered
 }

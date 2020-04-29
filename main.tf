@@ -7,7 +7,7 @@ provider "aws" {
 resource "aws_vpc" "app_vpc" {
    cidr_block = "10.0.0.0/16"
    tags = {
-       Name = "${var.name}-vpc"
+       Name = "${var.name}-vpc2"
    }
 }
 
@@ -17,6 +17,10 @@ resource "aws_internet_gateway" "igw" {
   tags = {
     Name = "${var.name}-ig"
   }
+}
+
+data "external" "myipaddr" {
+  program = ["bash", "-c", "curl -s 'https://api.ipify.org?format=json'"]
 }
 
 
@@ -30,21 +34,26 @@ resource "aws_internet_gateway" "igw" {
 #   }
 # }
 
-
 module "app" {
   source = "./modules/app_tier"
   vpc_id = aws_vpc.app_vpc.id
   name = var.name
   ami_id = var.ami_id
   igtw = aws_internet_gateway.igw.id
+  db_ip = module.mongod.instance_ip_addr
+  my_ip = data.external.myipaddr.result.ip
   # gateway_id = data.aws_internet_gateway.default-gw.id
 }
+
 module "mongod" {
   source = "./modules/mongod_tier"
   vpc_id = aws_vpc.app_vpc.id
   name2 = var.name2
   mongod_ami_id = var.mongod_ami_id
 }
+
+
+
 # Inbout and outbound rules for public subnet
 
 ### Creating DB
